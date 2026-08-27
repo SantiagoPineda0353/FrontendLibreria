@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
+import { BookOpen, Plus } from 'lucide-react';
 import { libroService, ejemplarService } from '../services/libroService';
 import type { Libro, LibroRequest } from '../types';
 import LibroForm from '../components/LibroForm';
 import LibroList from '../components/LibroList';
 import Alert from '../components/Alert';
+import Modal from '../components/Modal';
 
 export default function LibrosPage() {
   const [libros, setLibros] = useState<Libro[]>([]);
   const [libroEditando, setLibroEditando] = useState<Libro | null>(null);
+  const [modalAbierto, setModalAbierto] = useState(false);
   const [error, setError] = useState('');
   const [exito, setExito] = useState('');
 
@@ -17,17 +20,28 @@ export default function LibrosPage() {
 
   useEffect(cargarLibros, []);
 
+  const abrirNuevo = () => {
+    setLibroEditando(null);
+    setModalAbierto(true);
+  };
+
+  const abrirEditar = (libro: Libro) => {
+    setLibroEditando(libro);
+    setModalAbierto(true);
+  };
+
   const handleCrearOActualizar = async (dto: LibroRequest) => {
     setError('');
     try {
       if (libroEditando) {
         await libroService.actualizar(libroEditando.id, dto);
         setExito('Libro actualizado correctamente');
-        setLibroEditando(null);
       } else {
         await libroService.crear(dto);
         setExito('Libro creado correctamente');
       }
+      setModalAbierto(false);
+      setLibroEditando(null);
       cargarLibros();
     } catch (err: any) {
       setError(err.response?.data?.mensaje || 'Error al guardar el libro');
@@ -47,19 +61,20 @@ export default function LibrosPage() {
 
   return (
     <div>
-      <h2>Libros</h2>
+      <div className="page-header page-header--con-accion">
+        <div className="page-header-title">
+          <BookOpen size={24} strokeWidth={1.8} />
+          <h2>Libros</h2>
+        </div>
+        <button onClick={abrirNuevo}><Plus size={16} /> Nuevo libro</button>
+      </div>
+
       {error && <Alert type="error" message={error} onClose={() => setError('')} />}
       {exito && <Alert type="success" message={exito} onClose={() => setExito('')} />}
 
-      <LibroForm
-        valoresIniciales={libroEditando}
-        onSubmit={handleCrearOActualizar}
-        onCancelar={() => setLibroEditando(null)}
-      />
-
       <LibroList
         libros={libros}
-        onEditar={setLibroEditando}
+        onEditar={abrirEditar}
         onEliminar={handleEliminar}
         onCargarEjemplares={ejemplarService.porLibro}
         onAgregarEjemplar={async (libroId, codigoInventario) => {
@@ -71,6 +86,16 @@ export default function LibrosPage() {
           }
         }}
       />
+
+      {modalAbierto && (
+        <Modal titulo={libroEditando ? 'Editar libro' : 'Nuevo libro'} onClose={() => setModalAbierto(false)}>
+          <LibroForm
+            valoresIniciales={libroEditando}
+            onSubmit={handleCrearOActualizar}
+            onCancelar={() => setModalAbierto(false)}
+          />
+        </Modal>
+      )}
     </div>
   );
 }

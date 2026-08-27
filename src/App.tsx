@@ -13,7 +13,7 @@ function App() {
   return (
     <div className="app">
       <Navbar tabActivo={tab} onCambiarTab={setTab} />
-      <main>
+      <main className="main-content">
         {tab === 'libros' && <LibrosPage />}
         {tab === 'usuarios' && <UsuariosPage />}
         {tab === 'prestamos' && <PrestamosPage />}

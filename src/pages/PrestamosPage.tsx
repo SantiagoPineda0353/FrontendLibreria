@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Repeat, Search } from 'lucide-react';
 import { prestamoService } from '../services/prestamoService';
 import { usuarioService } from '../services/usuarioService';
 import { libroService, ejemplarService } from '../services/libroService';
@@ -70,7 +71,10 @@ export default function PrestamosPage() {
 
   return (
     <div>
-      <h2>Préstamos</h2>
+      <div className="page-header">
+        <Repeat size={24} strokeWidth={1.8} />
+        <h2>Préstamos</h2>
+      </div>
       {error && <Alert type="error" message={error} onClose={() => setError('')} />}
       {exito && <Alert type="success" message={exito} onClose={() => setExito('')} />}
 
@@ -80,13 +84,15 @@ export default function PrestamosPage() {
         <h3>Ejemplares disponibles por ISBN</h3>
         <div className="form-actions">
           <input placeholder="ISBN" value={isbnConsulta} onChange={e => setIsbnConsulta(e.target.value)} />
-          <button onClick={handleConsultarDisponibles}>Consultar</button>
+          <button onClick={handleConsultarDisponibles}><Search size={15} /> Consultar</button>
         </div>
         {ejemplaresDisponibles && (
-          <ul>
+          <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {ejemplaresDisponibles.length === 0
-              ? <li>No hay ejemplares disponibles</li>
-              : ejemplaresDisponibles.map(ej => <li key={ej.id}>{ej.codigoInventario}</li>)}
+              ? <li style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>No hay ejemplares disponibles</li>
+              : ejemplaresDisponibles.map(ej => (
+                <li key={ej.id} className="badge badge-devuelto">{ej.codigoInventario}</li>
+              ))}
           </ul>
         )}
       </div>
@@ -104,7 +110,7 @@ export default function PrestamosPage() {
               ? usuarios.map(u => <option key={u.id} value={u.id}>{u.nombre} {u.apellido}</option>)
               : libros.map(l => <option key={l.id} value={l.id}>{l.titulo}</option>)}
           </select>
-          <button onClick={handleConsultar}>Buscar</button>
+          <button onClick={handleConsultar}><Search size={15} /> Buscar</button>
         </div>
       </div>
 

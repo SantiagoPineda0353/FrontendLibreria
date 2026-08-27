@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Repeat } from 'lucide-react';
 import type { Usuario, Libro } from '../types';
 
 interface PrestamoFormProps {
@@ -21,7 +22,6 @@ export default function PrestamoForm({ usuarios, libros, onRegistrar }: Prestamo
 
   return (
     <form onSubmit={handleSubmit} className="form-card">
-      <h3>Registrar préstamo</h3>
       <select value={usuarioId} onChange={e => setUsuarioId(Number(e.target.value))} required>
         <option value="">Selecciona un usuario</option>
         {usuarios.map(u => <option key={u.id} value={u.id}>{u.nombre} {u.apellido}</option>)}
@@ -30,7 +30,9 @@ export default function PrestamoForm({ usuarios, libros, onRegistrar }: Prestamo
         <option value="">Selecciona un libro</option>
         {libros.map(l => <option key={l.id} value={l.isbn}>{l.titulo} ({l.isbn})</option>)}
       </select>
-      <button type="submit">Registrar préstamo</button>
+      <div className="form-actions">
+        <button type="submit"><Repeat size={16} /> Registrar préstamo</button>
+      </div>
     </form>
   );
 }
